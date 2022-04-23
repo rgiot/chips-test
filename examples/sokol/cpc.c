@@ -3,6 +3,9 @@
 
     Amstrad CPC 464/6128 and KC Compact. No disc emulation.
 */
+
+    #include <emscripten/emscripten.h>
+    #include <emscripten/html5.h>
 #include "common.h"
 #define CHIPS_IMPL
 #include "chips/z80.h"
@@ -364,3 +367,20 @@ sapp_desc sokol_main(int argc, char* argv[]) {
         .enable_dragndrop = true,
     };
 }
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+/// Add something to load a file from the memory
+EMSCRIPTEN_KEEPALIVE
+void cpc_inject_memory(const char* path, const uint8_t* ptr, uint32_t size) {
+    fs_load_mem(path, ptr, size);
+} 
+
+EMSCRIPTEN_KEEPALIVE
+void cpc_inject_keys(const char* keys) {
+    keybuf_put(keys);
+}
+#ifdef __cplusplus
+}
+#endif
